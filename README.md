@@ -15,6 +15,15 @@ This is a small engine the is written in cpp 23, this is just for fun.
 | CMake | Build system |
 | Nix | Package management |
 
+## Progress
+
+- [x] Input
+- [x] Vulkan renderer
+- [ ] Camera system
+- [ ] Lighting & shadows
+- [ ] Model loading (glTF)
+- [ ] Texture loading
+      
 ## Build
 
 ```bash
