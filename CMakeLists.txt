@@ -5,16 +5,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# After your find_package calls, add:
-include(FetchContent)
-
-FetchContent_Declare(cgltf
-    GIT_REPOSITORY https://github.com/jkuhlmann/cgltf.git
-    GIT_TAG v1.14
-)
-FetchContent_MakeAvailable(cgltf)
-target_include_directories(${PROJECT_NAME} PRIVATE ${cgltf_SOURCE_DIR})
-
 # Find required packages
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
@@ -30,14 +20,15 @@ find_path(GLM_INCLUDE_DIR
 
 # Source files
 set(SOURCES
-    source/main.cpp
-    source/vulkan_context.cpp
-    source/platform.cpp
-    source/drivers/render.cpp
-    source/drivers/swapchain.cpp
-    source/drivers/pipeline.cpp
-    source/drivers/commands.cpp
-    source/drivers/sync.cpp
+    source/main.cc
+    source/vulkan_context.cc
+    source/platform.cc
+    source/drivers/render.cc
+    source/drivers/swapchain.cc
+    source/drivers/pipeline.cc
+    source/drivers/buffer.cc
+    source/drivers/commands.cc
+    source/drivers/sync.cc
 )
 
 # Create executable

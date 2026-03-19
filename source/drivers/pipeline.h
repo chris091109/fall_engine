@@ -3,6 +3,7 @@
 #include <fstream>
 #include <print>
 #include <vector>
+#include "buffer.h"
 
 namespace Engine {
 

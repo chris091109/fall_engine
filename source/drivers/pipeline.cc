@@ -63,8 +63,15 @@ void Pipeline::create(VkDevice device, VkRenderPass render_pass, VkExtent2D exte
     dynamic_state.pDynamicStates    = dynamic_states.data();
 
     // Vertex input
+    auto binding    = Vertex::getBindingDescription();
+    auto attributes = Vertex::getAttributeDescriptions();
+
     VkPipelineVertexInputStateCreateInfo vertex_input{};
-    vertex_input.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertex_input.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertex_input.vertexBindingDescriptionCount   = 1;
+    vertex_input.pVertexBindingDescriptions      = &binding;
+    vertex_input.vertexAttributeDescriptionCount = static_cast<u32>(attributes.size());
+    vertex_input.pVertexAttributeDescriptions    = attributes.data();
 
     // Input assembly
     VkPipelineInputAssemblyStateCreateInfo input_assembly{};

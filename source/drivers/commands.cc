@@ -35,7 +35,7 @@ void Commands::reset(u32 frame)
 }
 
 void Commands::record(u32 frame, VkRenderPass render_pass, VkFramebuffer framebuffer,
-                      VkExtent2D extent, VkPipeline pipeline)
+                      VkExtent2D extent, VkPipeline pipeline, const Mesh& mesh)
 {
     VkCommandBuffer cmd = m_command_buffers[frame];
 
@@ -70,7 +70,11 @@ void Commands::record(u32 frame, VkRenderPass render_pass, VkFramebuffer framebu
     scissor.extent = extent;
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-    vkCmdDraw(cmd, 3, 1, 0, 0);
+    VkBuffer     vb     = mesh.vertex_buffer().handle();
+    VkDeviceSize offset = 0;
+    vkCmdBindVertexBuffers(cmd, 0, 1, &vb, &offset);
+    vkCmdBindIndexBuffer(cmd, mesh.index_buffer().handle(), 0, VK_INDEX_TYPE_UINT32);
+    vkCmdDrawIndexed(cmd, mesh.index_count(), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(cmd);
 

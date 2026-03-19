@@ -1,5 +1,6 @@
 #pragma once
 #include "../common.h"
+#include "buffer.h"
 #include <vector>
 
 namespace Engine {
@@ -11,10 +12,11 @@ public:
     ~Commands() { destroy(); }
 
     void record(u32 frame, VkRenderPass render_pass, VkFramebuffer framebuffer,
-                VkExtent2D extent, VkPipeline pipeline);
+                VkExtent2D extent, VkPipeline pipeline, const Mesh& mesh);
     void reset(u32 frame);
 
     VkCommandBuffer buffer(u32 frame) const { return m_command_buffers[frame]; }
+    VkCommandPool   pool()            const { return m_command_pool; }
 
     static constexpr i32 MAX_FRAMES_IN_FLIGHT = 2;
 

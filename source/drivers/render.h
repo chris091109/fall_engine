@@ -4,6 +4,7 @@
 #include "../platform.h"
 #include "swapchain.h"
 #include "pipeline.h"
+#include "buffer.h"
 #include "commands.h"
 #include "sync.h"
 
@@ -24,6 +25,7 @@ private:
     Swapchain m_swapchain;
     Pipeline  m_pipeline;
     Commands  m_commands;
+    Mesh      m_mesh;
     Sync      m_sync;
 
     void create_render_pass();

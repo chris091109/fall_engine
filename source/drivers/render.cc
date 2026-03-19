@@ -4,21 +4,31 @@
 
 namespace Engine {
 
+const std::vector<Vertex> vertices = {
+    {{ -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f }},
+    {{  0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f }},
+    {{  0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f }},
+    {{ -0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
+};
+ 
+const std::vector<u32> indices = { 0, 1, 2, 2, 3, 0 };
+ 
 Render::Render(Vulkan_Context& ctx, Platform& platform)
 {
     m_device         = ctx.get_device();
     m_graphics_queue = ctx.get_graphics_queue();
     m_present_queue  = ctx.get_present_queue();
-
+ 
     m_swapchain.create(m_device, ctx.get_physical_device(),
                        ctx.get_surface(), platform.get_handle(), ctx);
     m_swapchain.create_image_views();
-
     create_render_pass();
-
     m_pipeline.create(m_device, m_render_pass, m_swapchain.extent());
     m_swapchain.create_framebuffers(m_render_pass);
     m_commands.create(m_device, ctx.get_queue_families().graphicsFamily.value());
+    m_mesh.create(ctx.get_physical_device(), m_device,
+                  m_commands.pool(), m_graphics_queue,
+                  vertices, indices);
     m_sync.create(m_device, m_swapchain.image_count());
 }
 
@@ -81,10 +91,11 @@ void Render::pass()
                           m_sync.image_available(frame), VK_NULL_HANDLE, &image_index);
 
     m_commands.reset(frame);
-    m_commands.record(frame, m_render_pass,
-                      m_swapchain.framebuffer(image_index),
-                      m_swapchain.extent(),
-                      m_pipeline.handle());
+m_commands.record(frame, m_render_pass,
+                  m_swapchain.framebuffer(image_index),
+                  m_swapchain.extent(),
+                  m_pipeline.handle(),
+                  m_mesh);
 
     VkSemaphore wait_semaphores[]      = { m_sync.image_available(frame) };
     VkSemaphore signal_semaphores[] = { m_sync.render_finished(image_index) }; 
@@ -120,8 +131,8 @@ void Render::pass()
 Render::~Render()
 {
     vkDeviceWaitIdle(m_device);
+    m_mesh.destroy();
     vkDestroyRenderPass(m_device, m_render_pass, nullptr);
-    // m_sync, m_commands, m_pipeline, m_swapchain destructors fire automatically
 }
 
 } // namespace Engine
