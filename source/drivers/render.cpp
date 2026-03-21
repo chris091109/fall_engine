@@ -31,16 +31,13 @@ namespace Engine {
     m_graphics_queue = ctx.get_graphics_queue();
     m_present_queue  = ctx.get_present_queue();
 
-    m_swapchain.create(m_device, ctx.get_physical_device(),
-        ctx.get_surface(), platform.get_handle(), ctx, platform);
+    m_swapchain.create(ctx, *m_platform);
     m_swapchain.create_image_views();
     create_render_pass();
-    m_pipeline.create(m_device, m_render_pass, m_swapchain.extent());
+    m_pipeline.create(ctx, m_swapchain, m_render_pass);
     m_swapchain.create_framebuffers(m_render_pass);
-    m_commands.create(m_device, ctx.get_queue_families().graphicsFamily.value());
-    m_mesh.create(ctx.get_physical_device(), m_device,
-        m_commands.pool(), m_graphics_queue,
-        vertices, indices);
+    m_commands.create(ctx);
+    m_mesh.create(ctx, m_commands, vertices, indices);
     m_sync.create(m_device, m_swapchain.image_count());
   }
 

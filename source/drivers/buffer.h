@@ -1,10 +1,13 @@
 #pragma once
 
 #include "../common.h"
+#include "../vulkan_context.h"
+#include "commands.h"
 #include <print>
 #include <cstring>
 
 namespace Engine {
+  class Commands;
 
 struct Vertex {
     vec3 pos;
@@ -39,10 +42,9 @@ private:
 
 class Mesh {
 public:
-    void create(VkPhysicalDevice physical, VkDevice device,
-                VkCommandPool pool, VkQueue queue,
-                const std::vector<Vertex>& vertices,
-                const std::vector<u32>& indices);
+    void create(Vulkan_Context &ctx, Commands &commands, 
+        const std::vector<Vertex>& vertices,
+        const std::vector<u32>& indices);
     void destroy();
     ~Mesh() { destroy(); }
 

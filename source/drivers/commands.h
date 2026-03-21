@@ -2,12 +2,15 @@
 #include "../common.h"
 #include "buffer.h"
 #include <vector>
+#include "../vulkan_context.h"
 
 namespace Engine {
 
+  class Mesh;
+
 class Commands {
 public:
-    void create(VkDevice device, u32 queue_family_index);
+    void create(Vulkan_Context &ctx);
     void destroy();
     ~Commands() { destroy(); }
 
@@ -22,6 +25,7 @@ public:
 
 private:
     VkDevice      m_device       = VK_NULL_HANDLE;
+    u32 m_queue_family_index       = 0;
     VkCommandPool m_command_pool = VK_NULL_HANDLE;
 
     std::vector<VkCommandBuffer> m_command_buffers;

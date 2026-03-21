@@ -134,33 +134,32 @@ void Mesh::copy(VkDevice device, VkCommandPool pool, VkQueue queue,
     vkFreeCommandBuffers(device, pool, 1, &cmd);
 }
 
-void Mesh::create(VkPhysicalDevice physical, VkDevice device,
-                  VkCommandPool pool, VkQueue queue,
+void Mesh::create(Vulkan_Context &ctx, Commands &commands,
                   const std::vector<Vertex>& vertices,
                   const std::vector<u32>& indices)
 {
-    m_physical = physical;
-    m_device   = device;
+    m_physical = ctx.get_physical_device();
+    m_device   = ctx.get_device();
 
     // vertex
     {
         const VkDeviceSize size = sizeof(Vertex) * vertices.size();
 
         Buffer staging;
-        staging.create(physical, device, size,
+        staging.create(m_physical, m_device, size,
                        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         void* data;
-        vkMapMemory(device, staging.memory(), 0, size, 0, &data);
+        vkMapMemory(m_device, staging.memory(), 0, size, 0, &data);
         memcpy(data, vertices.data(), size);
-        vkUnmapMemory(device, staging.memory());
+        vkUnmapMemory(m_device, staging.memory());
 
-        m_vertex_buffer.create(physical, device, size,
+        m_vertex_buffer.create(m_physical, m_device, size,
                                VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        copy(device, pool, queue, staging.handle(), m_vertex_buffer.handle(), size);
+        copy(m_device, commands.pool(), ctx.get_present_queue(), staging.handle(), m_vertex_buffer.handle(), size);
     }
 
     // index
@@ -168,20 +167,20 @@ void Mesh::create(VkPhysicalDevice physical, VkDevice device,
         const VkDeviceSize size = sizeof(u32) * indices.size();
 
         Buffer staging;
-        staging.create(physical, device, size,
+        staging.create(m_physical, m_device, size,
                        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         void* data;
-        vkMapMemory(device, staging.memory(), 0, size, 0, &data);
+        vkMapMemory(m_device, staging.memory(), 0, size, 0, &data);
         memcpy(data, indices.data(), size);
-        vkUnmapMemory(device, staging.memory());
+        vkUnmapMemory(m_device, staging.memory());
 
-        m_index_buffer.create(physical, device, size,
+        m_index_buffer.create(m_physical, m_device, size,
                               VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        copy(device, pool, queue, staging.handle(), m_index_buffer.handle(), size);
+        copy(m_device, commands.pool(), ctx.get_present_queue(), staging.handle(), m_index_buffer.handle(), size);
     }
 
     m_vertex_count = static_cast<u32>(vertices.size());

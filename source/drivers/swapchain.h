@@ -8,9 +8,7 @@ namespace Engine {
 
 class Swapchain {
 public:
-    void create(VkDevice device, VkPhysicalDevice physical_device,
-                VkSurfaceKHR surface, GLFWwindow* window,
-                Vulkan_Context &ctx, Platform &platform);
+    void create(Vulkan_Context &vk_ctx, Platform &platform);
     void destroy();
     ~Swapchain() { destroy(); }
 

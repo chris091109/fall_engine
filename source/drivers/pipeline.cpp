@@ -1,22 +1,23 @@
 #include "pipeline.h"
+#include "swapchain.h"
 
 namespace Engine {
 
-std::vector<char> Pipeline::readFile(const std::string& path)
-{
+  std::vector<char> Pipeline::readFile(const std::string& path)
+  {
     std::ifstream file(path, std::ios::ate | std::ios::binary);
     if (!file.is_open())
-        throw std::runtime_error("failed to open file: " + path);
+      throw std::runtime_error("failed to open file: " + path);
 
     usize size = (usize)file.tellg();
     std::vector<char> buffer(size);
     file.seekg(0);
     file.read(buffer.data(), size);
     return buffer;
-}
+  }
 
-VkShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
-{
+  VkShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
+  {
     VkShaderModuleCreateInfo create_info{};
     create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     create_info.codeSize = code.size();
@@ -24,13 +25,15 @@ VkShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
 
     VkShaderModule module;
     if (vkCreateShaderModule(m_device, &create_info, nullptr, &module) != VK_SUCCESS)
-        throw std::runtime_error("failed to create shader module");
+      throw std::runtime_error("failed to create shader module");
     return module;
-}
+  }
 
-void Pipeline::create(VkDevice device, VkRenderPass render_pass, VkExtent2D extent)
-{
-    m_device = device;
+  void Pipeline::create(Vulkan_Context &ctx, Swapchain &swapchain, VkRenderPass render_pass)
+  {
+    m_ctx = &ctx;
+    m_swapchain = &swapchain;
+    m_device = ctx.get_device();
 
     auto vert_code = readFile("../build/src/drivers/shaders/vert.spv");
     auto frag_code = readFile("../build/src/drivers/shaders/frag.spv");
@@ -54,8 +57,8 @@ void Pipeline::create(VkDevice device, VkRenderPass render_pass, VkExtent2D exte
 
     // Dynamic state
     std::vector<VkDynamicState> dynamic_states = {
-        VK_DYNAMIC_STATE_VIEWPORT,
-        VK_DYNAMIC_STATE_SCISSOR
+      VK_DYNAMIC_STATE_VIEWPORT,
+      VK_DYNAMIC_STATE_SCISSOR
     };
     VkPipelineDynamicStateCreateInfo dynamic_state{};
     dynamic_state.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -99,7 +102,7 @@ void Pipeline::create(VkDevice device, VkRenderPass render_pass, VkExtent2D exte
     // Color blend
     VkPipelineColorBlendAttachmentState blend_attachment{};
     blend_attachment.colorWriteMask      = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-                                           VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+      VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     blend_attachment.blendEnable         = VK_TRUE;
     blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
     blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -117,8 +120,8 @@ void Pipeline::create(VkDevice device, VkRenderPass render_pass, VkExtent2D exte
     VkPipelineLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
-    if (vkCreatePipelineLayout(m_device, &layout_info, nullptr, &m_pipeline_layout) != VK_SUCCESS)
-        throw std::runtime_error("failed to create pipeline layout");
+    if (vkCreatePipelineLayout(m_ctx->get_device(), &layout_info, nullptr, &m_pipeline_layout) != VK_SUCCESS)
+      throw std::runtime_error("failed to create pipeline layout");
 
     // Graphics pipeline
     VkGraphicsPipelineCreateInfo pipeline_info{};
@@ -136,25 +139,23 @@ void Pipeline::create(VkDevice device, VkRenderPass render_pass, VkExtent2D exte
     pipeline_info.renderPass          = render_pass;
     pipeline_info.subpass             = 0;
 
-    if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_pipeline) != VK_SUCCESS)
-        throw std::runtime_error("failed to create graphics pipeline");
+    if (vkCreateGraphicsPipelines(m_ctx->get_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_pipeline) != VK_SUCCESS)
+      throw std::runtime_error("failed to create graphics pipeline");
 
-    vkDestroyShaderModule(m_device, frag_module, nullptr);
-    vkDestroyShaderModule(m_device, vert_module, nullptr);
+    vkDestroyShaderModule(m_ctx->get_device(), frag_module, nullptr);
+    vkDestroyShaderModule(m_ctx->get_device(), vert_module, nullptr);
 
     std::print("[pipeline] created\n");
-}
+  }
 
-void Pipeline::destroy()
-{
-    if (m_device == VK_NULL_HANDLE) return;
+  void Pipeline::destroy()
+  {
+    if (m_ctx->get_device() == VK_NULL_HANDLE) return;
 
-    vkDestroyPipeline(m_device, m_pipeline, nullptr);
-    vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
+    vkDestroyPipeline(m_ctx->get_device(), m_pipeline, nullptr);
+    vkDestroyPipelineLayout(m_ctx->get_device(), m_pipeline_layout, nullptr);
 
     m_pipeline        = VK_NULL_HANDLE;
     m_pipeline_layout = VK_NULL_HANDLE;
-    m_device          = VK_NULL_HANDLE;
-}
-
+  }
 } 

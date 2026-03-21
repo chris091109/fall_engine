@@ -1,5 +1,5 @@
 # fall_engine
-This is a small engine the is written in cpp 23, this is just for fun.
+This is a small engine the is written in cpp 23, this is just for fun as well for learing vulkan there may be so erros as well as comments that are wrong they will be fixed eventuly.
 
 ## Dependencies
 

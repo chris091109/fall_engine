@@ -37,16 +37,15 @@ namespace Engine {
     return extent;
   }
 
-  void Swapchain::create(VkDevice device, VkPhysicalDevice physical_device,
-      VkSurfaceKHR surface, GLFWwindow* window,
-      Vulkan_Context &ctx, Platform &platform)
+  void Swapchain::create(Vulkan_Context &ctx, Platform &platform)
   {
-    m_device          = device;
-    m_physical_device = physical_device;
-    m_surface         = surface;
-    m_window          = window;
+    m_device          = ctx.get_device();
+    m_physical_device = ctx.get_physical_device();
+    m_surface         = ctx.get_surface();
+    m_window          = platform.get_handle();
     m_ctx             = &ctx;
     m_platform        = &platform;
+
 
     Vulkan_Context::SwapChainSupportDetails details;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physical_device, m_surface, &details.capabilities);
@@ -196,18 +195,14 @@ namespace Engine {
 
     vkDeviceWaitIdle(m_device);
 
-    // snapshot before destroy() nulls them
-    VkDevice         device      = m_device;
-    VkPhysicalDevice phys        = m_physical_device;
-    VkSurfaceKHR     surface     = m_surface;
-    GLFWwindow*      window      = m_window;
+    // snapshot before destroy()
     Vulkan_Context*  ctx         = m_ctx;
     Platform*        platform    = m_platform;
     VkRenderPass     render_pass = m_render_pass;
 
     destroy();
 
-    create(device, phys, surface, window, *ctx, *platform);
+    create(*ctx, *platform);
     create_image_views();
     create_framebuffers(render_pass);
     std::printf("recreate swapchain\n");
