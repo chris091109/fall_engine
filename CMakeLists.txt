@@ -29,5 +29,5 @@ FetchContent_MakeAvailable(cgltf)
 
 find_program(GLSLC glslc REQUIRED)
 
-add_subdirectory(source/engine)
-add_subdirectory(source/game)
+add_subdirectory(engine)
+add_subdirectory(game)

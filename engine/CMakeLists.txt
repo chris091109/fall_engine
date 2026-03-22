@@ -23,7 +23,7 @@ target_precompile_headers(helix_engine PUBLIC
 )
 
 target_include_directories(helix_engine PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}          # engine/renderer/... etc
+    ${CMAKE_CURRENT_SOURCE_DIR}  
     ${CMAKE_SOURCE_DIR}/include
     ${Vulkan_INCLUDE_DIRS}
     ${GLM_INCLUDE_DIR}
