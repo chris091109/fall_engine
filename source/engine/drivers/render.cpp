@@ -34,7 +34,8 @@ namespace Engine {
     m_swapchain.create(ctx, *m_platform);
     m_swapchain.create_image_views();
     create_render_pass();
-    m_pipeline.create(ctx, m_swapchain, m_render_pass);
+    m_camera.create(ctx);
+    m_pipeline.create(ctx, m_swapchain, m_render_pass, m_camera.set_layout());
     m_swapchain.create_framebuffers(m_render_pass);
     m_commands.create(ctx);
     m_mesh.create(ctx, m_commands, vertices, indices);
@@ -103,11 +104,14 @@ namespace Engine {
     vkAcquireNextImageKHR(m_device, m_swapchain.handle(), UINT64_MAX,
         m_sync.image_available(frame), VK_NULL_HANDLE, &image_index);
 
+    m_camera.update(frame, m_platform->get_aspect_ratio());
     m_commands.reset(frame);
     m_commands.record(frame, m_render_pass,
         m_swapchain.framebuffer(image_index),
         m_swapchain.extent(),
         m_pipeline.handle(),
+        m_pipeline.layout(),
+        m_camera.set(frame),
         m_mesh);
 
     VkSemaphore wait_semaphores[]      = { m_sync.image_available(frame) };

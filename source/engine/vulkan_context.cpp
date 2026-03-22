@@ -13,10 +13,10 @@ namespace Engine {
 #ifdef NDEBUG
   constexpr b8 enableValidationLayers = false;
 #else
-  constexpr b8 enableValidationLayers = true;
+  constexpr bool enableValidationLayers = true;
 #endif
 
-  b8 Vulkan_Context::checkValidationLayerSupport() {
+  bool Vulkan_Context::checkValidationLayerSupport() {
 
     u32 layerCount = 0;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -25,7 +25,7 @@ namespace Engine {
     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
     for (const char* layerName : validationLayers) {
-      b8 layerFound = false;
+      bool layerFound = false;
 
       for (const auto& layerProperties : availableLayers) {
         if (strcmp(layerName, layerProperties.layerName) == 0) {

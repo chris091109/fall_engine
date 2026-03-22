@@ -8,6 +8,7 @@
 #include <glm/vec2.hpp>
 #include "common.h"
 #include <print>
+#include <string>
 
 namespace Engine {
 
@@ -24,7 +25,7 @@ namespace Engine {
       ~Platform(void);
 
       f64 delta = 0;
-      b8 framebuffer_resized = false;
+      bool framebuffer_resized = false;
 
       void set_window_mode(WindowMode new_window_mode);
       bool should_close(void);
@@ -32,24 +33,26 @@ namespace Engine {
 
       GLFWwindow *get_handle(void);
 
-      b8 input_pressed(int key);
-      b8 input_released(int key);
+      bool input_pressed(int key);
+      bool input_released(int key);
       f32 input_vector2(int key_a, int key_b, f64 dt);
       vec2 input_mouse_dt();
       vec2 input_mouse_location();
+      f32 get_aspect_ratio() { return (f32)m_current.width / (f32)m_current.height; }
+
 
     private:
       struct WindowState {
-        u32 width  = 600;
-        u32 height = 450;
-        int x           = 100;
-        int y           = 100;
+        int width  = 600;
+        int height = 450;
+        int x      = 100;
+        int y      = 100;
       };
 
       WindowState m_windowed   = { 500, 500, 100, 100 };
       WindowState m_current    = { 600, 450, 0, 0 };
 
-      const char *m_title      = "Helix";
+      std::string m_title = "Helix";
       WindowMode m_window_mode = WindowModeWindowed;
 
 
@@ -60,6 +63,6 @@ namespace Engine {
       f32 m_axis_value = 0.0f;
       f64 m_mouse_last_x = 0.0;
       f64 m_mouse_last_y = 0.0;
-      b8  m_mouse_first  = true;
+      bool  m_mouse_first  = true;
   };
 }

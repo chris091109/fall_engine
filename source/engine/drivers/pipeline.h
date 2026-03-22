@@ -12,7 +12,8 @@ namespace Engine {
 
   class Pipeline {
     public:
-      void create(Vulkan_Context &ctx, Swapchain &swapchain, VkRenderPass render_pass);
+      void create(Vulkan_Context &ctx, Swapchain &swapchain, VkRenderPass render_pass,
+                  VkDescriptorSetLayout cam_set_layout);
       void destroy();
       ~Pipeline() { destroy(); }
 

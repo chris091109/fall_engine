@@ -2,6 +2,7 @@
 #include "../common.h"
 #include "../vulkan_context.h"
 #include "../platform.h"
+#include "../assets/camera.h"
 #include "swapchain.h"
 #include "pipeline.h"
 #include "buffer.h"
@@ -24,6 +25,7 @@ private:
     VkRenderPass m_render_pass    = VK_NULL_HANDLE;
 
     Swapchain m_swapchain;
+    Camera    m_camera;
     Pipeline  m_pipeline;
     Commands  m_commands;
     Mesh      m_mesh;

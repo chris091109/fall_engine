@@ -15,7 +15,7 @@ namespace Engine {
     m_monitor = glfwGetPrimaryMonitor();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-    m_handle = glfwCreateWindow(m_current.width, m_current.height, m_title, nullptr, nullptr);
+    m_handle = glfwCreateWindow(m_current.width, m_current.height, m_title.c_str(), nullptr, nullptr);
     if (!m_handle)
     {
       std::print("[FAIL] create window\n");
@@ -28,11 +28,12 @@ namespace Engine {
     glfwSetWindowPos(m_handle, m_windowed.x, m_windowed.y);
 
     glfwSetWindowUserPointer(m_handle, this);
-    glfwSetFramebufferSizeCallback(m_handle, [](GLFWwindow* window, int, int) {
+    glfwSetFramebufferSizeCallback(m_handle, [](GLFWwindow* window, int width, int height) {
         auto* p = static_cast<Platform*>(glfwGetWindowUserPointer(window));
         p->framebuffer_resized = true;
+        p->m_current.width  = width;
+        p->m_current.height = height;
         });
-
     std::print("[Platform] created\n");
   }
 
@@ -67,7 +68,7 @@ namespace Engine {
 
     m_window_mode = new_window_mode;
   }
-  b8 Platform::should_close(void) { return glfwWindowShouldClose(m_handle); }
+  bool Platform::should_close(void) { return glfwWindowShouldClose(m_handle); }
   void Platform::pollevents(void)
   {
     f64 now  = glfwGetTime();
@@ -77,12 +78,12 @@ namespace Engine {
   }
   GLFWwindow *Platform::get_handle(void) { return m_handle; }
 
-  b8 Platform::input_pressed(int key)
+  bool Platform::input_pressed(int key)
   {
     return glfwGetKey(m_handle, key) == GLFW_PRESS;
   }
 
-  b8 Platform::input_released(int key)
+  bool Platform::input_released(int key)
   {
     return glfwGetKey(m_handle, key) == GLFW_RELEASE;
   }

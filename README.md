@@ -19,7 +19,9 @@ This is a small engine the is written in cpp 23, this is just for fun as well fo
 
 - [x] Input
 - [x] Vulkan renderer
-- [ ] Camera system
+- [x] Spliting engine and "game"
+- [x] Fullscreen
+- [x] Camera system
 - [ ] Lighting & shadows
 - [ ] Model loading (glTF)
 - [ ] Texture loading

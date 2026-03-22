@@ -1,9 +1,7 @@
 #pragma once
 
-#include <cstdint> 
-#include <glm/common.hpp>
-#include <string>
-#include <vector>
+#include <cstdint>
+#include <cstddef>
 
 // Unsigned integers
 using u8  = uint8_t;
@@ -21,14 +19,16 @@ using i64 = int64_t;
 using f32 = float;
 using f64 = double;
 
-// Bool point
-using b8 = bool;
-
 using usize = size_t;
+
+// GLM
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 using vec2 = glm::vec2;
 using vec3 = glm::vec3;
 using mat4 = glm::mat4;
-
-using string = std::string;
-
+using quat = glm::quat;

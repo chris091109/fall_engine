@@ -37,19 +37,20 @@ namespace Engine {
     vkResetCommandBuffer(m_command_buffers[frame], 0);
   }
 
-  void Commands::record(u32 frame, VkRenderPass render_pass, VkFramebuffer framebuffer,
-      VkExtent2D extent, VkPipeline pipeline, const Mesh& mesh)
+    void Commands::record(u32 frame, VkRenderPass render_pass, VkFramebuffer framebuffer,
+      VkExtent2D extent, VkPipeline pipeline, VkPipelineLayout pipeline_layout,
+      VkDescriptorSet cam_set, const Mesh& mesh)
   {
     VkCommandBuffer cmd = m_command_buffers[frame];
-
+ 
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
+ 
     if (vkBeginCommandBuffer(cmd, &begin_info) != VK_SUCCESS)
       throw std::runtime_error("failed to begin command buffer");
-
+ 
     VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
-
+ 
     VkRenderPassBeginInfo rp_info{};
     rp_info.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     rp_info.renderPass        = render_pass;
@@ -58,29 +59,32 @@ namespace Engine {
     rp_info.renderArea.extent = extent;
     rp_info.clearValueCount   = 1;
     rp_info.pClearValues      = &clear_color;
-
+ 
     vkCmdBeginRenderPass(cmd, &rp_info, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-
+ 
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        pipeline_layout, 0, 1, &cam_set, 0, nullptr);
+ 
     VkViewport viewport{};
     viewport.width    = static_cast<float>(extent.width);
     viewport.height   = static_cast<float>(extent.height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
     vkCmdSetViewport(cmd, 0, 1, &viewport);
-
+ 
     VkRect2D scissor{};
     scissor.extent = extent;
     vkCmdSetScissor(cmd, 0, 1, &scissor);
-
+ 
     VkBuffer     vb     = mesh.vertex_buffer().handle();
     VkDeviceSize offset = 0;
     vkCmdBindVertexBuffers(cmd, 0, 1, &vb, &offset);
     vkCmdBindIndexBuffer(cmd, mesh.index_buffer().handle(), 0, VK_INDEX_TYPE_UINT32);
     vkCmdDrawIndexed(cmd, mesh.index_count(), 1, 0, 0, 0);
-
+ 
     vkCmdEndRenderPass(cmd);
-
+ 
     if (vkEndCommandBuffer(cmd) != VK_SUCCESS)
       throw std::runtime_error("failed to record command buffer");
   }

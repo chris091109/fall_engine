@@ -25,7 +25,7 @@ namespace Engine {
       {
         std::optional<u32> graphicsFamily;
         std::optional<u32> presentFamily;
-        b8 isComplete() { return graphicsFamily.has_value() && presentFamily.has_value(); }
+        bool isComplete() { return graphicsFamily.has_value() && presentFamily.has_value(); }
       };
 
       struct SwapChainSupportDetails
